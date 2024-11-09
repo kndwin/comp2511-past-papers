@@ -9,5 +9,8 @@ hero:
     - theme: brand
       text: Past papers
       link: /past-papers/
+    - theme: alt
+      text: Notes      
+      lint: notes.md
 ---
 

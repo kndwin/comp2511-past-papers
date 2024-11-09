@@ -7,8 +7,15 @@ export default defineConfig({
   themeConfig: {
     sidebar: [
       {
+        text: "",
+        items: [{ text: "Notes", link: "/notes" }],
+      },
+      {
         text: "Past papers",
-        items: [{ text: "23T2", link: "/past-papers/23T2" }],
+        items: [
+          { text: "22T2", link: "/past-papers/22T2" },
+          { text: "23T2", link: "/past-papers/23T2" },
+        ],
       },
     ],
     search: {
