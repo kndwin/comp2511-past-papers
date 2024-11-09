@@ -11,6 +11,6 @@ hero:
       link: /past-papers/
     - theme: alt
       text: Notes      
-      lint: notes.md
+      link: /notes
 ---
 
