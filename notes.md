@@ -1,7 +1,3 @@
-<script setup>
-import Tabs from './components/Tabs.vue'
-</script>
-
 ::: details Table of content
 
 [[toc]]
