@@ -8,16 +8,21 @@ export default defineConfig({
       md.use(tabsMarkdownPlugin);
     },
     toc: {
-      level: [2, 3, 4],
+      level: [2, 3],
     },
   },
   title: "comp2511",
   description: "Past papers for COMP2511",
   themeConfig: {
+    outline: [2, 3],
     sidebar: [
       {
-        text: "",
-        items: [{ text: "Notes", link: "/notes" }],
+        text: "Notes",
+        items: [
+          { text: "Code smell", link: "/notes/code-smell" },
+          { text: "Design patterns", link: "/notes/patterns" },
+          { text: "Principles", link: "/notes/principles" },
+        ],
       },
       {
         text: "Past papers",

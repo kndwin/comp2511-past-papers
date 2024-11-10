@@ -1,14 +1,8 @@
-::: details Table of content
-
-[[toc]]
-
-:::
-
-## Code smell
-### Bloaters
+# Code smell
+## Bloaters
 
 Bloaters are code, methods and classes that have increased to such gargantuan proportions that they’re hard to work with. Usually these smells don’t crop up right away, rather they accumulate over time as the program evolves (and especially when nobody makes an effort to eradicate them).
-#### Long method
+### Long method
 A method contains too many lines of code. Generally, any method longer than ten lines should make you start asking questions.
 
 :::tabs
@@ -90,7 +84,7 @@ class OrderProcessor {
 ~~~
 
 :::
-#### Large class
+### Large class
 A class contains many fields/methods/lines of code.[
 
 :::tabs
@@ -142,7 +136,7 @@ class PaymentProcessor {
 
 :::
 
-#### Primitive Obsession
+### Primitive Obsession
 - Use of primitives instead of small objects for simple tasks (such as currency, ranges, special strings for phone numbers, etc.)
 - Use of constants for coding information (such as a constant USER_ADMIN_ROLE = 1 for referring to users with administrator rights.)
 - Use of string constants as field names for use in data arrays.
@@ -192,7 +186,7 @@ class Money {
 
 :::
 
-#### Long Parameter List
+### Long Parameter List
 More than three or four parameters for a method.
 
 ::: tabs
@@ -224,7 +218,7 @@ class Report {
 ~~~
 :::
 
-#### Data Clumps
+### Data Clumps
 Sometimes different parts of the code contain identical groups of variables (such as parameters for connecting to a database). These clumps should be turned into their own classes.
 
 ::: tabs
@@ -272,8 +266,8 @@ class ReportGenerator {
 ~~~
 :::
 
-### Object-Orientation Abuser
-#### Switch Statements
+## Object-Orientation Abuser
+### Switch Statements
 
 You have a complex `switch` operator or sequence of `if` statements.
 
@@ -326,7 +320,7 @@ class PayPalProcessor implements PaymentProcessor {
 ~~~
 :::
 
-#### Temporary Field
+### Temporary Field
 
 Temporary fields get their values (and thus are needed by objects) only under certain circumstances. Outside of these circumstances, they’re empty.
 
@@ -365,7 +359,7 @@ class Order {
 ~~~
 :::
 
-#### Refused Bequest
+### Refused Bequest
 If a subclass uses only some of the methods and properties inherited from its parents, the hierarchy is off-kilter. The unneeded methods may simply go unused or be redefined and give off exceptions.
 
 ::: tabs
@@ -408,7 +402,7 @@ class Penguin implements Bird {
 ~~~
 :::
 
-#### Alternative Classes with Different Interfaces
+### Alternative Classes with Different Interfaces
 Two classes perform identical functions but have different method names.
 ::: tabs
 == Before
@@ -443,10 +437,10 @@ class DatabaseStorage implements UserStorage {
 ~~~
 :::
 
-###  Change Preventers
+##  Change Preventers
 
 These smells mean that if you need to change something in one place in your code, you have to make many changes in other places too. Program development becomes much more complicated and expensive as a result.
-#### Divergent Change
+### Divergent Change
 
 You find yourself having to change many unrelated methods when you make changes to a class. For example, when adding a new product type you have to change the methods for finding, displaying, and ordering products.
 
@@ -537,7 +531,7 @@ class Electronics extends Product {
 
 ~~~
 :::
-#### Shotgun Surgery
+### Shotgun Surgery
 
 Making any modifications requires that you make many small changes to many different classes.
 
@@ -604,7 +598,7 @@ class Support {
 }
 ~~~
 :::
-#### Parallel Inheritance Hierarchies
+### Parallel Inheritance Hierarchies
 
 Whenever you create a subclass for a class, you find yourself needing to create a subclass for another class.
 
@@ -680,11 +674,11 @@ class CatFeeder implements Feeder {
 ~~~
 :::
 
-### Dispensables
+## Dispensables
 
 A dispensable is something pointless and unneeded whose absence would make the code cleaner, more efficient and easier to understand.
 
-#### Comments
+### Comments
 A method is filled with explanatory comments.
 
 ::: tabs
@@ -725,7 +719,7 @@ class UserValidator {
 ```
 :::
 
-#### Duplicate Code
+### Duplicate Code
 Two code fragments look almost identical.
 
 ::: tabs
@@ -774,7 +768,7 @@ class PaymentProcessor {
 ```
 :::
 
-#### Lazy Class
+### Lazy Class
 Understanding and maintaining classes always costs time and money. So if a class doesn't do enough to earn your attention, it should be deleted.
 
 ::: tabs
@@ -805,7 +799,7 @@ class Address {
 ```
 :::
 
-#### Data Class
+### Data Class
 A data class refers to a class that contains only fields and crude methods for accessing them.
 
 ::: tabs
@@ -847,7 +841,7 @@ class Customer {
 ```
 :::
 
-#### Dead Code
+### Dead Code
 A variable, parameter, field, method or class is no longer used.
 
 ::: tabs
@@ -882,7 +876,7 @@ class OrderProcessor {
 ```
 :::
 
-#### Speculative Generality
+### Speculative Generality
 There's an unused class, method, field or parameter.
 
 ::: tabs
@@ -925,9 +919,9 @@ class Cat implements Animal {
 ```
 :::
 
-### Couplers
+## Couplers
 All the smells in this group contribute to excessive coupling between classes or show what happens if coupling is replaced by excessive delegation.
-#### Feature Envy
+### Feature Envy
 A method that's more interested in another class than the one it's in.
 
 ::: tabs
@@ -964,7 +958,7 @@ class Customer {
 ```
 :::
 
-#### Inappropriate Intimacy
+### Inappropriate Intimacy
 Classes that are too tightly coupled, accessing each other's private members.
 
 ::: tabs
@@ -1009,7 +1003,7 @@ class Course {
 ```
 :::
 
-#### Message Chains
+### Message Chains
 Long chains of method calls that create tight coupling between classes.
 
 ::: tabs
@@ -1044,7 +1038,7 @@ class AddressLocator {
 ```
 :::
 
-#### Middle Man
+### Middle Man
 A class that delegates all its work to another class.
 
 ::: tabs
@@ -1084,177 +1078,3 @@ class Client {
 }
 ```
 :::
-## Patterns
-#### Strategy
-- Dynamically change strategies at runtime
-- Add/remove strategies at will
-- Limited logic around changing strategies
-```java
-// 1. Strategy Pattern
-interface PaymentStrategy { void pay(int amount); }
-class PayPal implements PaymentStrategy { 
-    public void pay(int amount) { System.out.println("PayPal: $" + amount); }
-}
-class CreditCard implements PaymentStrategy {
-    public void pay(int amount) { System.out.println("CC: $" + amount); }
-}
-class Cart {
-    private PaymentStrategy paymentStrategy;
-    public void setStrategy(PaymentStrategy strategy) { this.paymentStrategy = strategy; }
-    public void checkout(int amount) { paymentStrategy.pay(amount); }
-}
-```
-
-#### State
-- Has states
-- Actions -> cause transitions
-- Logic around those actions
-~~~java
-// 2. State Pattern
-interface State { void handle(Player player); }
-class StandingState implements State {
-    public void handle(Player player) { player.setState(new JumpingState()); }
-}
-class JumpingState implements State {
-    public void handle(Player player) { player.setState(new StandingState()); }
-}
-class Player {
-    private State state = new StandingState();
-    public void setState(State state) { this.state = state; }
-    public void action() { state.handle(this); }
-}
-~~~
-#### Composite
-- Compound nodes + Left nodes
-- Tree hierarchy
-- You don't care whether you're talking to a leaf or a compound node
-~~~java
-// 3. Composite Pattern
-abstract class FileSystem {
-    protected String name;
-    abstract void ls();
-}
-class File extends FileSystem {
-    public File(String name) { this.name = name; }
-    void ls() { System.out.println(name); }
-}
-class Directory extends FileSystem {
-    private List<FileSystem> children = new ArrayList<>();
-    public Directory(String name) { this.name = name; }
-    public void add(FileSystem fs) { children.add(fs); }
-    void ls() {
-        System.out.println(name);
-        children.forEach(FileSystem::ls);
-    }
-}
-~~~
-#### Observer
-- Thing being observed (subject, consumer, subscriber, listener)
-- Thing doing the observing (observer, producer)
-- Method of notification (push/pull)
-- A change in state causes the updating/notification
-~~~java
-// 1. Observer Pattern
-interface Observer { void update(String news); }
-class NewsAgency {
-    private List<Observer> observers = new ArrayList<>();
-    public void addObserver(Observer o) { observers.add(o); }
-    public void notifyObservers(String news) { observers.forEach(o -> o.update(news)); }
-}
-class NewsChannel implements Observer {
-    public void update(String news) { System.out.println("Breaking: " + news); }
-}
-~~~
-#### Factory
-- Create other objects - have some logic around creation
--  Abstraction creation in some way
-~~~java
-interface Animal { void speak(); }
-class Dog implements Animal { public void speak() { System.out.println("Woof"); } }
-class Cat implements Animal { public void speak() { System.out.println("Meow"); } }
-class AnimalFactory {
-    public Animal createAnimal(String type) {
-        return switch (type) {
-            case "dog" -> new Dog();
-            case "cat" -> new Cat();
-            default -> throw new IllegalArgumentException();
-        };
-    }
-}
-~~~
-#### Decorator
-- Dynamically add functionality
-- "Layering" / wrapping
-- Can decorate to an interface, not an implementation
-~~~java
-interface Coffee { double cost(); }
-class SimpleCoffee implements Coffee { public double cost() { return 1; } }
-abstract class CoffeeDecorator implements Coffee {
-    protected Coffee coffee;
-    public CoffeeDecorator(Coffee c) { this.coffee = c; }
-    public double cost() { return coffee.cost(); }
-}
-class Milk extends CoffeeDecorator {
-    public Milk(Coffee c) { super(c); }
-    public double cost() { return super.cost() + 0.5; }
-}
-~~~
-#### Template
-- Series of steps
-- Some steps are abstractly defined, some concretely defined
-- "Hook" methods
-~~~java
-abstract class DataMiner {
-    public final void mine() {
-        openFile();
-        extractData();
-        parseData();
-        closeFile();
-    }
-    abstract void extractData();
-    void openFile() { System.out.println("Opening"); }
-    void parseData() { System.out.println("Parsing"); }
-    void closeFile() { System.out.println("Closing"); }
-}
-class PDFMiner extends DataMiner {
-    void extractData() { System.out.println("Extracting PDF"); }
-}
-~~~
-#### Visitor
-- Seperate algorithm and implementation
-- Add functionality to an existing system (legacy)
-- Build in "hook" into the system to latch functionality on
-~~~java
-interface Shape { void accept(ShapeVisitor visitor); }
-class Circle implements Shape {
-    public void accept(ShapeVisitor visitor) { visitor.visit(this); }
-}
-class Square implements Shape {
-    public void accept(ShapeVisitor visitor) { visitor.visit(this); }
-}
-interface ShapeVisitor {
-    void visit(Circle circle);
-    void visit(Square square);
-}
-class AreaVisitor implements ShapeVisitor {
-    public void visit(Circle circle) { System.out.println("Calculate circle area"); }
-    public void visit(Square square) { System.out.println("Calculate square area"); }
-}
-~~~
-#### Iterator
-- Abstract traversal from container/algorithm
-- Access elements in a linear order
-~~~java
-class CustomCollection<T> {
-    private List<T> items = new ArrayList<>();
-    public void add(T item) { items.add(item); }
-    
-    public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            private int index = 0;
-            public boolean hasNext() { return index < items.size(); }
-            public T next() { return items.get(index++); }
-        };
-    }
-}
-~~~
