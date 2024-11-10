@@ -680,14 +680,409 @@ class CatFeeder implements Feeder {
 ~~~
 :::
 
+### Dispensables
+
+A dispensable is something pointless and unneeded whose absence would make the code cleaner, more efficient and easier to understand.
+
+#### Comments
+A method is filled with explanatory comments.
 
 ::: tabs
 == Before
-~~~java
-~~~
+```java{3,8,13,18}
+class UserValidator {
+    public boolean validateUser(User user) {
+        // Check if the user is null
+        if (user == null) {
+            return false;
+        }
+        
+        // Check if the username is empty
+        if (user.getUsername().isEmpty()) {
+            return false;
+        }
+        
+        // Check if the email is valid
+        if (!user.getEmail().contains("@")) {
+            return false;
+        }
+        
+        // If all checks pass, return true
+        return true;
+    }
+}
+```
+
 == After
-~~~java
-~~~
+```java
+class UserValidator {
+    public boolean validateUser(User user) {
+        return user != null
+            && !user.getUsername().isEmpty()
+            && user.getEmail().contains("@");
+    }
+}
+```
+:::
+
+#### Duplicate Code
+Two code fragments look almost identical.
+
+::: tabs
+== Before
+```java{4-9,15-20}
+class PaymentProcessor {
+    public double calculateRegularPayment(Order order) {
+        double total = 0;
+        for (Item item : order.getItems()) {
+            double price = item.getPrice();
+            double tax = price * 0.2;
+            double shipping = 5.0;
+            total += price + tax + shipping;
+        }
+        return total;
+    }
+    
+    public double calculatePrimePayment(Order order) {
+        double total = 0;
+        for (Item item : order.getItems()) {
+            double price = item.getPrice();
+            double tax = price * 0.2;
+            double shipping = 0.0;  // Only difference is free shipping
+            total += price + tax + shipping;
+        }
+        return total;
+    }
+}
+```
+
+== After
+```java
+class PaymentProcessor {
+    public double calculatePayment(Order order, boolean isPrime) {
+        double total = 0;
+        double shippingFee = isPrime ? 0.0 : 5.0;
+        
+        for (Item item : order.getItems()) {
+            double price = item.getPrice();
+            double tax = price * 0.2;
+            total += price + tax + shippingFee;
+        }
+        return total;
+    }
+}
+```
+:::
+
+#### Lazy Class
+Understanding and maintaining classes always costs time and money. So if a class doesn't do enough to earn your attention, it should be deleted.
+
+::: tabs
+== Before
+```java
+class Address {
+    private String street;
+    private String city;
+}
+
+class AddressFormatter {
+    public String format(Address address) {
+        return address.getStreet() + ", " + address.getCity();
+    }
+}
+```
+
+== After
+```java
+class Address {
+    private String street;
+    private String city;
+    
+    public String format() {
+        return street + ", " + city;
+    }
+}
+```
+:::
+
+#### Data Class
+A data class refers to a class that contains only fields and crude methods for accessing them.
+
+::: tabs
+== Before
+```java
+class Customer {
+    private String name;
+    private String email;
+    private int age;
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
+}
+```
+
+== After
+```java
+class Customer {
+    private String name;
+    private String email;
+    private int age;
+
+    public boolean isAdult() {
+        return age >= 18;
+    }
+    
+    public void sendEmailNotification(String message) {
+        EmailService.send(email, message);
+    }
+    
+    public String getFormattedName() {
+        return name.toUpperCase();
+    }
+}
+```
+:::
+
+#### Dead Code
+A variable, parameter, field, method or class is no longer used.
+
+::: tabs
+== Before
+```java
+class OrderProcessor {
+    private boolean isLegacySystem = false;  // Never used
+    
+    public void processOrder(Order order) {
+        validateOrder(order);
+        // Old payment method, not used anymore
+        if (isLegacySystem) {
+            processLegacyPayment(order);
+        }
+        saveOrder(order);
+    }
+    
+    private void processLegacyPayment(Order order) {
+        // Legacy payment logic
+    }
+}
+```
+
+== After
+```java
+class OrderProcessor {
+    public void processOrder(Order order) {
+        validateOrder(order);
+        saveOrder(order);
+    }
+}
+```
+:::
+
+#### Speculative Generality
+There's an unused class, method, field or parameter.
+
+::: tabs
+== Before
+```java
+interface Animal {
+    void eat();
+    void sleep();
+    void fly();  // What if some animals need to fly?
+    void swim();  // What if some animals need to swim?
+}
+
+class Cat implements Animal {
+    public void eat() { /* implementation */ }
+    public void sleep() { /* implementation */ }
+    public void fly() { /* empty - cats don't fly */ }
+    public void swim() { /* empty - most cats don't swim */ }
+}
+```
+
+== After
+```java
+interface Animal {
+    void eat();
+    void sleep();
+}
+
+interface Flyable {
+    void fly();
+}
+
+interface Swimmable {
+    void swim();
+}
+
+class Cat implements Animal {
+    public void eat() { /* implementation */ }
+    public void sleep() { /* implementation */ }
+}
+```
+:::
+
+### Couplers
+All the smells in this group contribute to excessive coupling between classes or show what happens if coupling is replaced by excessive delegation.
+#### Feature Envy
+A method that's more interested in another class than the one it's in.
+
+::: tabs
+== Before
+```java
+class Order {
+    private Customer customer;
+    
+    public double calculateTotal() {
+        double basePrice = customer.getBasePrice();
+        double discount = customer.getDiscount();
+        double tax = customer.getTaxRate();
+        
+        return basePrice * (1 - discount) * (1 + tax);
+    }
+}
+```
+
+== After
+```java
+class Order {
+    private Customer customer;
+    
+    public double calculateTotal() {
+        return customer.calculatePrice();
+    }
+}
+
+class Customer {
+    public double calculatePrice() {
+        return getBasePrice() * (1 - getDiscount()) * (1 + getTaxRate());
+    }
+}
+```
+:::
+
+#### Inappropriate Intimacy
+Classes that are too tightly coupled, accessing each other's private members.
+
+::: tabs
+== Before
+```java{6-7}
+class Student {
+    private List<Course> courses;
+    
+    public void enrollInCourse(Course course) {
+        courses.add(course);
+        course.studentList.add(this); // Directly accessing private field
+        course.numberOfStudents++; // Directly accessing private field
+    }
+}
+
+class Course {
+    List<Student> studentList;
+    private int numberOfStudents;
+}
+```
+
+== After
+```java
+class Student {
+    private List<Course> courses;
+    
+    public void enrollInCourse(Course course) {
+        courses.add(course);
+        course.addStudent(this);
+    }
+}
+
+class Course {
+    private List<Student> studentList;
+    private int numberOfStudents;
+    
+    public void addStudent(Student student) {
+        studentList.add(student);
+        numberOfStudents++;
+    }
+}
+```
+:::
+
+#### Message Chains
+Long chains of method calls that create tight coupling between classes.
+
+::: tabs
+== Before
+```java
+class Client {
+    public void printUserAddress() {
+        String zip = getCompany()
+            .getDepartment()
+            .getManager()
+            .getAddress()
+            .getZipCode();
+        System.out.println(zip);
+    }
+}
+```
+
+== After
+```java
+class Client {
+    public void printUserAddress() {
+        Address address = addressLocator.getManagerAddress(company);
+        System.out.println(address.getZipCode());
+    }
+}
+
+class AddressLocator {
+    public Address getManagerAddress(Company company) {
+        return company.getManagerAddress();
+    }
+}
+```
+:::
+
+#### Middle Man
+A class that delegates all its work to another class.
+
+::: tabs
+== Before
+```java
+class PersonProxy {
+    private Person person;
+    
+    public String getName() {
+        return person.getName();
+    }
+    
+    public void setName(String name) {
+        person.setName(name);
+    }
+    
+    public String getAddress() {
+        return person.getAddress();
+    }
+    
+    public void setAddress(String address) {
+        person.setAddress(address);
+    }
+}
+```
+
+== After
+```java
+// Simply use Person directly instead of going through PersonProxy
+class Client {
+    private Person person;
+    
+    public void updatePerson(String name, String address) {
+        person.setName(name);
+        person.setAddress(address);
+    }
+}
+```
 :::
 ## Patterns
 ### Strategy
