@@ -1,5 +1,6 @@
 node_modules
 .obsidian
+.obsidian.vimrc
 .vitepress/cache
 .vitepress/dist
 .wrangler
