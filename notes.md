@@ -6,7 +6,10 @@
 
 ## Code smell
 ### Bloaters
+
+Bloaters are code, methods and classes that have increased to such gargantuan proportions that they’re hard to work with. Usually these smells don’t crop up right away, rather they accumulate over time as the program evolves (and especially when nobody makes an effort to eradicate them).
 #### Long method
+A method contains too many lines of code. Generally, any method longer than ten lines should make you start asking questions.
 
 :::tabs
 == Before
@@ -87,7 +90,8 @@ class OrderProcessor {
 ~~~
 
 :::
-### Large class
+#### Large class
+A class contains many fields/methods/lines of code.[
 
 :::tabs
 == Before
@@ -138,7 +142,11 @@ class PaymentProcessor {
 
 :::
 
-### Primitive Obsession
+#### Primitive Obsession
+- Use of primitives instead of small objects for simple tasks (such as currency, ranges, special strings for phone numbers, etc.)
+- Use of constants for coding information (such as a constant USER_ADMIN_ROLE = 1 for referring to users with administrator rights.)
+- Use of string constants as field names for use in data arrays.
+
 ::: tabs
 == Before
 
@@ -184,7 +192,8 @@ class Money {
 
 :::
 
-### Long Parameter List
+#### Long Parameter List
+More than three or four parameters for a method.
 
 ::: tabs
 == Before
@@ -215,6 +224,471 @@ class Report {
 ~~~
 :::
 
+#### Data Clumps
+Sometimes different parts of the code contain identical groups of variables (such as parameters for connecting to a database). These clumps should be turned into their own classes.
+
+::: tabs
+== Before
+~~~java
+class OrderProcessor {
+    public void connect(String url, String username, String password, int port) {
+        // Connect to database
+    }
+}
+
+class ReportGenerator {
+    public void connect(String url, String username, String password, int port) {
+        // Connect to database
+    }
+}
+~~~
+== After
+~~~java
+class DatabaseCredentials {
+    private String url;
+    private String username;
+    private String password;
+    private int port;
+    
+    public DatabaseCredentials(String url, String username, String password, int port) {
+        this.url = url;
+        this.username = username;
+        this.password = password;
+        this.port = port;
+    }
+}
+
+class OrderProcessor {
+    public void connect(DatabaseCredentials credentials) {
+        // Connect to database
+    }
+}
+
+class ReportGenerator {
+    public void connect(DatabaseCredentials credentials) {
+        // Connect to database
+    }
+}
+~~~
+:::
+
+### Object-Orientation Abuser
+#### Switch Statements
+
+You have a complex `switch` operator or sequence of `if` statements.
+
+::: tabs
+== Before
+~~~java
+class PaymentProcessor {
+    double processPayment(String paymentType, double amount) {
+        double fee;
+        switch (paymentType) {
+            case "CREDIT_CARD":
+                fee = amount * 0.03;
+                break;
+            case "DEBIT_CARD":
+                fee = amount * 0.02;
+                break;
+            case "PAYPAL":
+                fee = amount * 0.04;
+                break;
+            default:
+                fee = 0;
+        }
+        return amount + fee;
+    }
+}
+~~~
+== After
+~~~java
+interface PaymentProcessor {
+    double processPayment(double amount);
+}
+
+class CreditCardProcessor implements PaymentProcessor {
+    public double processPayment(double amount) {
+        return amount + (amount * 0.03);
+    }
+}
+
+class DebitCardProcessor implements PaymentProcessor {
+    public double processPayment(double amount) {
+        return amount + (amount * 0.02);
+    }
+}
+
+class PayPalProcessor implements PaymentProcessor {
+    public double processPayment(double amount) {
+        return amount + (amount * 0.04);
+    }
+}
+~~~
+:::
+
+#### Temporary Field
+
+Temporary fields get their values (and thus are needed by objects) only under certain circumstances. Outside of these circumstances, they’re empty.
+
+::: tabs
+== Before
+~~~java
+class Order {
+    private double subtotal;
+    private double tax;  // Only used during calculation
+    private double discount;  // Only used during calculation
+    
+    public double calculateTotal() {
+        tax = subtotal * 0.1;
+        discount = subtotal > 100 ? subtotal * 0.05 : 0;
+        return subtotal + tax - discount;
+    }
+}
+~~~
+== After
+~~~java
+class Order {
+    private double subtotal;
+
+    public double calculateTotal() {
+        return subtotal + calculateTax() - calculateDiscount();
+    }
+
+    private double calculateTax() {
+        return subtotal * 0.1;
+    }
+
+    private double calculateDiscount() {
+        return subtotal > 100 ? subtotal * 0.05 : 0;
+    }
+}
+~~~
+:::
+
+#### Refused Bequest
+If a subclass uses only some of the methods and properties inherited from its parents, the hierarchy is off-kilter. The unneeded methods may simply go unused or be redefined and give off exceptions.
+
+::: tabs
+== Before
+~~~java
+class Bird {
+    void fly() { /* implementation */ }
+    void makeSound() { /* implementation */ }
+    void layEggs() { /* implementation */ }
+}
+
+class Penguin extends Bird {
+    @Override
+    void fly() {
+        throw new UnsupportedOperationException("Penguins can't fly!");
+    }
+}
+~~~
+== After
+~~~java
+interface Bird {
+    void makeSound();
+    void layEggs();
+}
+
+interface FlyingBird extends Bird {
+    void fly();
+}
+
+class Sparrow implements FlyingBird {
+    public void fly() { /* implementation */ }
+    public void makeSound() { /* implementation */ }
+    public void layEggs() { /* implementation */ }
+}
+
+class Penguin implements Bird {
+    public void makeSound() { /* implementation */ }
+    public void layEggs() { /* implementation */ }
+}
+~~~
+:::
+
+#### Alternative Classes with Different Interfaces
+Two classes perform identical functions but have different method names.
+::: tabs
+== Before
+~~~java
+class UserFileHandler {
+    void saveUser(User user) { /* saves to file */ }
+    User loadUser(int id) { /* loads from file */ }
+}
+
+class UserDbManager {
+    void writeUserToDatabase(User user) { /* saves to DB */ }
+    User getUserFromDatabase(int id) { /* loads from DB */ }
+}
+~~~
+== After
+~~~java
+// [!code ++]
+interface UserStorage {
+    void save(User user);
+    User load(int id);
+}
+
+class FileStorage implements UserStorage {
+    public void save(User user) { /* saves to file */ }
+    public User load(int id) { /* loads from file */ }
+}
+
+class DatabaseStorage implements UserStorage {
+    public void save(User user) { /* saves to DB */ }
+    public User load(int id) { /* loads from DB */ }
+}
+~~~
+:::
+
+###  Change Preventers
+
+These smells mean that if you need to change something in one place in your code, you have to make many changes in other places too. Program development becomes much more complicated and expensive as a result.
+#### Divergent Change
+
+You find yourself having to change many unrelated methods when you make changes to a class. For example, when adding a new product type you have to change the methods for finding, displaying, and ordering products.
+
+::: tabs
+== Before
+~~~java
+class Product {
+    private String name;
+    private double price;
+
+    // Methods change for different reasons
+    public String getDisplayInfo() {
+        if (isBook()) {
+            return name + " - Author: " + getAuthor();
+        } else if (isElectronics()) {
+            return name + " - Warranty: " + getWarranty();
+        }
+        return name;
+    }
+
+    public double calculateShipping() {
+        if (isBook()) {
+            return 2.99;
+        } else if (isElectronics()) {
+            return 9.99;
+        }
+        return 4.99;
+    }
+
+    public String getInventoryStatus() {
+        if (isBook()) {
+            return "Books section, aisle " + getBookAisle();
+        } else if (isElectronics()) {
+            return "Electronics section, shelf " + getElectronicsShelf();
+        }
+        return "General section";
+    }
+}
+~~~
+== After
+~~~java
+abstract class Product {
+    protected String name;
+    protected double price;
+
+    abstract String getDisplayInfo();
+    abstract double calculateShipping();
+    abstract String getInventoryStatus();
+}
+
+class Book extends Product {
+    private String author;
+    
+    @Override
+    String getDisplayInfo() {
+        return name + " - Author: " + author;
+    }
+
+    @Override
+    double calculateShipping() {
+        return 2.99;
+    }
+
+    @Override
+    String getInventoryStatus() {
+        return "Books section, aisle " + getBookAisle();
+    }
+}
+
+class Electronics extends Product {
+    private String warranty;
+
+    @Override
+    String getDisplayInfo() {
+        return name + " - Warranty: " + warranty;
+    }
+
+    @Override
+    double calculateShipping() {
+        return 9.99;
+    }
+
+    @Override
+    String getInventoryStatus() {
+        return "Electronics section, shelf " + getElectronicsShelf();
+    }
+}
+
+~~~
+:::
+#### Shotgun Surgery
+
+Making any modifications requires that you make many small changes to many different classes.
+
+::: tabs
+== Before
+~~~java
+class Customer {
+    private String email;
+    
+    public void sendEmail(String message) {
+        System.out.println("Sending email to: " + email);
+    }
+}
+
+class Order {
+    private String customerEmail;
+    
+    public void notifyCustomer() {
+        System.out.println("Sending email to: " + customerEmail);
+    }
+}
+
+class Support {
+    private String userEmail;
+    
+    public void sendTicketUpdate() {
+        System.out.println("Sending email to: " + userEmail);
+    }
+}
+~~~
+== After
+~~~java
+class EmailService {
+    public void sendEmail(String email, String message) {
+        System.out.println("Sending email to: " + email);
+    }
+}
+
+class Customer {
+    private String email;
+    private EmailService emailService;
+    
+    public void sendEmail(String message) {
+        emailService.sendEmail(email, message);
+    }
+}
+
+class Order {
+    private Customer customer;
+    private EmailService emailService;
+    
+    public void notifyCustomer() {
+        emailService.sendEmail(customer.getEmail(), "Order update");
+    }
+}
+
+class Support {
+    private Customer customer;
+    private EmailService emailService;
+    
+    public void sendTicketUpdate() {
+        emailService.sendEmail(customer.getEmail(), "Ticket update");
+    }
+}
+~~~
+:::
+#### Parallel Inheritance Hierarchies
+
+Whenever you create a subclass for a class, you find yourself needing to create a subclass for another class.
+
+::: tabs
+== Before
+~~~java
+class Animal {
+    protected String name;
+}
+
+class Dog extends Animal {
+    public void bark() {}
+}
+
+class Cat extends Animal {
+    public void meow() {}
+}
+
+class AnimalFeeder {
+    protected String foodType;
+}
+
+class DogFeeder extends AnimalFeeder {
+    public void feedDog() {}
+}
+
+class CatFeeder extends AnimalFeeder {
+    public void feedCat() {}
+}
+~~~
+== After
+~~~java
+class Animal {
+    protected String name;
+    protected Feeder feeder;
+    
+    public void feed() {
+        feeder.feed();
+    }
+}
+
+class Dog extends Animal {
+    public Dog() {
+        this.feeder = new DogFeeder();
+    }
+    
+    public void bark() {}
+}
+
+class Cat extends Animal {
+    public Cat() {
+        this.feeder = new CatFeeder();
+    }
+    
+    public void meow() {}
+}
+
+interface Feeder {
+    void feed();
+}
+
+class DogFeeder implements Feeder {
+    public void feed() {
+        // Dog specific feeding
+    }
+}
+
+class CatFeeder implements Feeder {
+    public void feed() {
+        // Cat specific feeding
+    }
+}
+~~~
+:::
+
+
+::: tabs
+== Before
+~~~java
+~~~
+== After
+~~~java
+~~~
+:::
 ## Patterns
 ### Strategy
 
