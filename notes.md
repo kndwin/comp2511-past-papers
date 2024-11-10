@@ -1085,8 +1085,7 @@ class Client {
 ```
 :::
 ## Patterns
-### Strategy
-
+#### Strategy
 - Dynamically change strategies at runtime
 - Add/remove strategies at will
 - Limited logic around changing strategies
@@ -1106,7 +1105,7 @@ class Cart {
 }
 ```
 
-### State
+#### State
 - Has states
 - Actions -> cause transitions
 - Logic around those actions
@@ -1125,7 +1124,7 @@ class Player {
     public void action() { state.handle(this); }
 }
 ~~~
-### Composite
+#### Composite
 - Compound nodes + Left nodes
 - Tree hierarchy
 - You don't care whether you're talking to a leaf or a compound node
@@ -1149,7 +1148,7 @@ class Directory extends FileSystem {
     }
 }
 ~~~
-### Observer
+#### Observer
 - Thing being observed (subject, consumer, subscriber, listener)
 - Thing doing the observing (observer, producer)
 - Method of notification (push/pull)
@@ -1166,7 +1165,7 @@ class NewsChannel implements Observer {
     public void update(String news) { System.out.println("Breaking: " + news); }
 }
 ~~~
-### Factory
+#### Factory
 - Create other objects - have some logic around creation
 -  Abstraction creation in some way
 ~~~java
@@ -1183,7 +1182,7 @@ class AnimalFactory {
     }
 }
 ~~~
-### Decorator
+#### Decorator
 - Dynamically add functionality
 - "Layering" / wrapping
 - Can decorate to an interface, not an implementation
@@ -1200,7 +1199,7 @@ class Milk extends CoffeeDecorator {
     public double cost() { return super.cost() + 0.5; }
 }
 ~~~
-### Template
+#### Template
 - Series of steps
 - Some steps are abstractly defined, some concretely defined
 - "Hook" methods
@@ -1221,7 +1220,7 @@ class PDFMiner extends DataMiner {
     void extractData() { System.out.println("Extracting PDF"); }
 }
 ~~~
-### Visitor
+#### Visitor
 - Seperate algorithm and implementation
 - Add functionality to an existing system (legacy)
 - Build in "hook" into the system to latch functionality on
@@ -1242,7 +1241,7 @@ class AreaVisitor implements ShapeVisitor {
     public void visit(Square square) { System.out.println("Calculate square area"); }
 }
 ~~~
-### Iterator
+#### Iterator
 - Abstract traversal from container/algorithm
 - Access elements in a linear order
 ~~~java

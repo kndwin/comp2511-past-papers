@@ -22,8 +22,10 @@ export default defineConfig({
       {
         text: "Past papers",
         items: [
+          { text: "21T3", link: "/past-papers/21T3" },
           { text: "22T2", link: "/past-papers/22T2" },
           { text: "23T2", link: "/past-papers/23T2" },
+          { text: "24T1", link: "/past-papers/24T1" },
         ],
       },
     ],
