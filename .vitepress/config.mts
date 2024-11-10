@@ -1,7 +1,16 @@
 import { defineConfig } from "vitepress";
+import { tabsMarkdownPlugin } from "vitepress-plugin-tabs";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  markdown: {
+    config: (md) => {
+      md.use(tabsMarkdownPlugin);
+    },
+    toc: {
+      level: [2, 3, 4],
+    },
+  },
   title: "comp2511",
   description: "Past papers for COMP2511",
   themeConfig: {

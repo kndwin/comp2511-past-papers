@@ -1,3 +1,7 @@
+<script setup>
+import Tabs from './components/Tabs.vue'
+</script>
+
 ::: details Table of content
 
 [[toc]]
@@ -5,6 +9,215 @@
 :::
 
 ## Code smell
+### Bloaters
+#### Long method
+
+:::tabs
+== Before
+
+~~~java
+class OrderProcessor {
+    public void processOrder(Order order) {
+        // Validate order
+        if (order.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Order is empty");
+        }
+        if (order.getCustomer() == null) {
+            throw new IllegalArgumentException("Customer is missing");
+        }
+        
+        // Calculate totals
+        double subtotal = 0;
+        for (Item item : order.getItems()) {
+            subtotal += item.getPrice() * item.getQuantity();
+        }
+        double tax = subtotal * 0.1;
+        double total = subtotal + tax;
+        
+        // Apply discount
+        if (order.getCustomer().isVip()) {
+            total = total * 0.9;
+        }
+        
+        // Update inventory
+        for (Item item : order.getItems()) {
+            Inventory.decrease(item.getId(), item.getQuantity());
+        }
+        
+        // Save order
+        order.setTotal(total);
+        Database.save(order);
+    }
+}
+~~~
+
+== After
+
+~~~java
+class OrderProcessor {
+    public void processOrder(Order order) {
+        validateOrder(order);
+        double total = calculateTotal(order);
+        total = applyDiscount(total, order.getCustomer());
+        updateInventory(order.getItems());
+        saveOrder(order, total);
+    }
+
+    private void validateOrder(Order order) {
+        if (order.getItems().isEmpty()) throw new IllegalArgumentException("Order is empty");
+        if (order.getCustomer() == null) throw new IllegalArgumentException("Customer is missing");
+    }
+
+    private double calculateTotal(Order order) {
+        double subtotal = order.getItems().stream()
+            .mapToDouble(item -> item.getPrice() * item.getQuantity())
+            .sum();
+        return subtotal + (subtotal * 0.1); // Add tax
+    }
+
+    private double applyDiscount(double total, Customer customer) {
+        return customer.isVip() ? total * 0.9 : total;
+    }
+
+    private void updateInventory(List<Item> items) {
+        items.forEach(item -> Inventory.decrease(item.getId(), item.getQuantity()));
+    }
+
+    private void saveOrder(Order order, double total) {
+        order.setTotal(total);
+        Database.save(order);
+    }
+}
+~~~
+
+:::
+### Large class
+
+:::tabs
+== Before
+
+~~~java
+class UserManager {
+    private String username;
+    private String password;
+    private String email;
+    private String address;
+    private String phoneNumber;
+    private List<Order> orders;
+    private PaymentDetails paymentDetails;
+    private ShippingPreferences shippingPreferences;
+    
+    public void createUser() { /* ... */ }
+    public void updateProfile() { /* ... */ }
+    public void changePassword() { /* ... */ }
+    public void processOrder() { /* ... */ }
+    public void calculateShipping() { /* ... */ }
+    public void handlePayment() { /* ... */ }
+    // Many more methods...
+}
+~~~
+== After
+~~~java
+class User {
+    private String username;
+    private String password;
+    private String email;
+    private Profile profile;
+}
+
+class Profile {
+    private String address;
+    private String phoneNumber;
+}
+
+class OrderManager {
+    public void processOrder(Order order) { /* ... */ }
+    public void calculateShipping(ShippingPreferences prefs) { /* ... */ }
+}
+
+class PaymentProcessor {
+    public void handlePayment(PaymentDetails details) { /* ... */ }
+}
+~~~
+
+:::
+
+### Primitive Obsession
+::: tabs
+== Before
+
+~~~java
+class User {
+    private String phoneNumber;  // Format: "XXX-XXX-XXXX"
+    private int userType;        // 1 = admin, 2 = regular, 3 = guest
+    private double money;        // USD
+    
+    public boolean isAdmin() {
+        return userType == 1;
+    }
+}
+~~~
+
+== After
+
+~~~java
+class User {
+    private PhoneNumber phoneNumber;
+    private UserType userType;
+    private Money money;
+    
+    public boolean isAdmin() {
+        return userType == UserType.ADMIN;
+    }
+}
+
+class PhoneNumber {
+    private String number;
+    public PhoneNumber(String number);
+}
+
+enum UserType {
+    ADMIN, REGULAR, GUEST
+}
+
+class Money {
+    private BigDecimal amount;
+    private Currency currency;
+}
+~~~
+
+:::
+
+### Long Parameter List
+
+::: tabs
+== Before
+~~~java
+class Report {
+    public void generateReport(String title, String date, String author, 
+                             String content, String format, String fontSize,
+                             String color) {
+        // Generate report with all parameters
+    }
+}
+~~~
+== After
+~~~java
+class ReportConfig {
+    private String title;
+    private String date;
+    private String author;
+    private String content;
+    private Format format;
+}
+
+class Report {
+    public void generateReport(ReportConfig config) {
+        // Generate report using config object
+    }
+}
+~~~
+:::
 
 ## Patterns
 ### Strategy
