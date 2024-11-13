@@ -1538,3 +1538,43 @@ System.out.println(editor.getContent()); // Prints: "Hello World"
    - Use **Visitor** when:
      - You need to perform operations on all elements of a complex object structure
      - You want to add new operations without changing the classes of the elements
+
+
+1. "Wraps an object and provides a different interface to it"
+- **Adapter Pattern**: Converts one interface into another that clients expect
+
+2. "Subclasses decide how to implement steps in an algorithm"
+- **Template Method Pattern**: Defines skeleton of algorithm, letting subclasses override specific steps
+
+3. "Subclasses decide which concrete classes to create"
+- **Factory Method Pattern**: Creates objects without specifying exact class
+
+4. "Ensures one and only one object is created"
+- **Singleton Pattern**: Guarantees a class has only one instance
+
+5. "Encapsulates interchangeable behaviors and uses delegation to decide which one to use"
+- **Strategy Pattern**: Defines family of algorithms and makes them interchangeable
+
+6. "Clients treat collections of objects and individual objects uniformly"
+- **Composite Pattern**: Composes objects into tree structures
+
+7. "Encapsulates state-based behaviors and uses delegation to switch between behaviors"
+- **State Pattern**: Allows object to alter behavior when state changes
+
+8. "Provides a way to traverse a collection of objects without exposing its implementation"
+- **Iterator Pattern**: Accesses elements sequentially without exposing underlying structure
+
+9. "Simplifies the interface of a set of classes"
+- **Facade Pattern**: Provides unified interface to a set of interfaces
+
+10. "Wraps an object to provide new behavior"
+- **Decorator Pattern**: Adds responsibilities to objects dynamically
+
+11. "Allows a client to create families of objects without specifying their concrete classes"
+- **Abstract Factory Pattern**: Creates families of related objects
+
+12. "Allows objects to be notified when state changes"
+- **Observer Pattern**: Defines one-to-many dependency between objects
+
+13. "Encapsulates a request as an object"
+- **Command Pattern**: Encapsulates request as an object
