@@ -26,6 +26,7 @@ export default withMermaid({
           { text: "Code smell", link: "/notes/code-smell" },
           { text: "Design patterns", link: "/notes/patterns" },
           { text: "Principles", link: "/notes/principles" },
+          { text: "Other", link: "/notes/other" },
         ],
       },
       {
