@@ -1,8 +1,12 @@
-import { defineConfig } from "vitepress";
 import { tabsMarkdownPlugin } from "vitepress-plugin-tabs";
+import { withMermaid } from "vitepress-plugin-mermaid";
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default withMermaid({
+  mermaidPlugin: {
+    class: "mermaid my-class", // set additional css classes for parent container
+  },
+
   markdown: {
     config: (md) => {
       md.use(tabsMarkdownPlugin);
