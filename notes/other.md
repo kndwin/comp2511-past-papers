@@ -1,7 +1,5 @@
 ## Relationships
 
-I'll break down each type of UML relationship in detail.
-
 # 1. Association
 **Description**: Basic relationship where one class uses another class in some way
 **Example**: A Student takes Courses
@@ -140,9 +138,3 @@ Predicate<String> isEmpty = str -> str.length() == 0;
 Supplier<String> greeter = () -> "hello";
 // Usage: greeter.get() -> "hello"
 ```
-
-Key points:
-- Each has ONE abstract method to implement
-- Used as type for lambda expressions
-- Common in Stream API and collections
-- Can be composed using default methods (andThen, compose)
