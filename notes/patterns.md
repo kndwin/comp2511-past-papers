@@ -1540,6 +1540,8 @@ System.out.println(editor.getContent()); // Prints: "Hello World"
      - You want to add new operations without changing the classes of the elements
 
 
+# Patterns 
+
 1. "Wraps an object and provides a different interface to it"
 - **Adapter Pattern**: Converts one interface into another that clients expect
 
